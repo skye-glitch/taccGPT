@@ -41,3 +41,11 @@ services:
     volumes:
       - ./frontend_gradio/main.py:/etc/TACC_GPT/main.py
       - ./frontend_gradio/load_ml_model.py:/etc/TACC_GPT/load_ml_model.py
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 3
+            device_ids: ['0','1','2']
+            capabilities: [gpu]

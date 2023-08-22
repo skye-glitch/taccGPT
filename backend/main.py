@@ -45,8 +45,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="./static"), name="static")
-templates = Jinja2Templates(directory="./templates")
+app.mount("/static", StaticFiles(directory="/etc/backend/static"), name="static")
+templates = Jinja2Templates(directory="/etc/backend/templates")
 
 @app.get('/')
 def root():

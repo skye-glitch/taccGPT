@@ -44,6 +44,7 @@ def create_chatbot(path, max_new_tokens):
     generator = pipeline("text-generation",
                          model=model,
                          tokenizer=tokenizer,
+                         device='cuda:0'
                          torch_dtype=torch.float16)
     
     async def chat(message, history):
