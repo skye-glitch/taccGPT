@@ -1,0 +1,7 @@
+pyOpenSSL
+gradio
+pandas
+requests
+uvicorn
+fastapi
+transformers

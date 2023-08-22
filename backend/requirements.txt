@@ -1,0 +1,8 @@
+pyOpenSSL
+gradio
+pandas
+uvicorn
+fastapi
+starlette
+motor
+itsdangerous

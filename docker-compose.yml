@@ -1,0 +1,43 @@
+version: '3.9'
+services:
+  database:
+    container_name: database
+    image: mongo
+    volumes:
+      - ./data/database:/data/db
+    ports:
+      - "27017:27017"
+    restart: always
+
+  backend:
+    container_name: backend
+    build: ./backend
+    ports:
+      - "9990:9990"
+    restart: always
+    volumes:
+      - ./backend/main.py:/etc/backend/main.py
+      - ./backend/models.py:/etc/backend/models.py
+      - ./backend/database.py:/etc/backend/database.py
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/etc/frontend/src:ro
+      - ./frontend/public/images:/etc/frontend/images:ro
+
+  frontend_gradio:
+    container_name: frontend_gradio
+    build: ./frontend_gradio
+    ports:
+      - "9991:9991"
+    # image: anibali/pytorch:2.0.0-cuda11.8
+    image: pytorch/pytorch:latest
+    restart: always
+    volumes:
+      - ./frontend_gradio/main.py:/etc/TACC_GPT/main.py
+      - ./frontend_gradio/load_ml_model.py:/etc/TACC_GPT/load_ml_model.py
