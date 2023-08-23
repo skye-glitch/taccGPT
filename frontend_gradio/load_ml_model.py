@@ -41,6 +41,7 @@ def create_taccgpt_chat(path, max_new_tokens):
     model.config.end_token_id = tokenizer.eos_token_id
     model.config.pad_token_id = model.config.eos_token_id
     model.resize_token_embeddings(len(tokenizer))
+    # transformers(>4.32.0) model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=4) which claims can better utilize cuda core
     generator = pipeline("text-generation",
                          model=model,
                          tokenizer=tokenizer,
@@ -82,6 +83,7 @@ def create_taccgpt_rank(path, max_new_tokens):
     model.config.end_token_id = tokenizer.eos_token_id
     model.config.pad_token_id = model.config.eos_token_id
     model.resize_token_embeddings(len(tokenizer))
+    # transformers(>4.32.0) model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=4) which claims can better utilize cuda core
     generator = pipeline("text-generation",
                          model=model,
                          tokenizer=tokenizer,
