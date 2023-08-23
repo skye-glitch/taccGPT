@@ -35,7 +35,6 @@ services:
     build: ./frontend_gradio
     ports:
       - "9995:9995"
-    image: pytorch/pytorch:latest
     restart: always
     volumes:
       - ./frontend_gradio/main.py:/etc/TACC_GPT/main.py

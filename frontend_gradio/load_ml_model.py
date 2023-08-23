@@ -44,8 +44,7 @@ def create_taccgpt_chat(path, max_new_tokens):
     generator = pipeline("text-generation",
                          model=model,
                          tokenizer=tokenizer,
-                         torch_dtype=torch.float32,
-                         device='cpu')
+                         torch_dtype=torch.float16)
     
     async def chat(message, history):
         processed_input = f"Human: {message}\n Assistant: " # Deepspeed chat required format
