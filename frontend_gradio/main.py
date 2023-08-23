@@ -71,7 +71,7 @@ def parse_args():
         help="Maximum new tokens to generate per response",
     )
     parser.add_argument('--http_host', default='0.0.0.0')
-    parser.add_argument('--http_port', type=int, default=9995)
+    parser.add_argument('--http_port', type=int, default=9991)
     args = parser.parse_args()
     return args
 

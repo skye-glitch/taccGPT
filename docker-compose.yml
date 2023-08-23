@@ -34,8 +34,5 @@ services:
     container_name: frontend_gradio
     build: ./frontend_gradio
     ports:
-      - "9995:9995"
+      - "9991:9991"
     restart: always
-    volumes:
-      - ./frontend_gradio/main.py:/etc/TACC_GPT/main.py
-      - ./frontend_gradio/load_ml_model.py:/etc/TACC_GPT/load_ml_model.py

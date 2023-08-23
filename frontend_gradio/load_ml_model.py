@@ -68,11 +68,10 @@ def create_taccgpt_rank(path, max_new_tokens):
         if os.path.exists(model_json):
             model_json_file = json.load(open(model_json))
             model_name = model_json_file["_name_or_path"]
-            tokenizer = AutoTokenizer.from_pretrained(model_name,
-                                                      fast_tokenizer=True)
+            tokenizer = AutoTokenizer.from_pretrained(model_name,fast_tokenizer=True)
     else:
         tokenizer = AutoTokenizer.from_pretrained(path, fast_tokenizer=True)
-
+    
     tokenizer.pad_token = tokenizer.eos_token
 
     model_config = AutoConfig.from_pretrained(path)
@@ -91,7 +90,7 @@ def create_taccgpt_rank(path, max_new_tokens):
     def generate_answers(message, numAnswers):
         message_repeated = [f"Human: {message}\n Assistant: " for _ in range(numAnswers)]
 
-        res = [process_response(x) for x in generator(message_repeated, temperature=0.9, top_p=0.9, do_sample=True, max_new_tokens=max_new_tokens)]
+        res = [process_response(x) for x in generator(message_repeated, temperature=0.2, top_p=0.95, top_k=50, do_sample=True, max_new_tokens=max_new_tokens)]
         return res
 
     return generate_answers

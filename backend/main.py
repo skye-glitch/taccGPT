@@ -34,8 +34,8 @@ HTTP_PORT=9990
 
 origins = ["http://frontend:3000",
            "http://localhost:3000",
-           "http://frontend_gradio:9995",
-           "http://frontend_gradio:9995/TACC_GPT"]
+           "http://frontend_gradio:9991",
+           "http://frontend_gradio:9991/TACC_GPT"]
 
 app.add_middleware(
     CORSMiddleware,
