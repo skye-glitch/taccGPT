@@ -103,13 +103,13 @@ function DragNDrop(props){
     let count = 0;
     for(let i = props.numAnswers; i < props.numAnswers*2; i++) {
       const textareas=groups[i].querySelectorAll("textarea");
-      const rankingResult = {"rank":i-5, "rankingAnswers":[]};
+      const rankingResult = {"rank":i-props.numAnswers, "rankingAnswers":[]};
       if(textareas !== null){
         for(let j = 0; j < textareas.length; j++) {
           rankingResult["rankingAnswers"][j] = String(textareas[j].value)
           count += 1;
         }
-        rankingResults["rankings"][i-5] = rankingResult
+        rankingResults["rankings"][i-props.numAnswers] = rankingResult
       }
     }
     if(count === props.numAnswers) console.log(rankingResults["rankings"]);
@@ -176,9 +176,9 @@ function DragNDrop(props){
           <div key={grpIdx} 
           onDragEnter={dragging && grp.items.length===0?(e) => onDragEnterHandle(e, {grpIdx, itemIdx:0}):null}
           className='dnd-group'
-          id="dnd-group">
+          >
             <div key={grp.group+grpIdx} className="group-title">
-              {grpIdx < 5?null:grp.group}
+              {grpIdx < props.numAnswers?null:grp.group}
             </div>
             {grp.items.map((item, itemIdx)=>(
               <div key={itemIdx} 

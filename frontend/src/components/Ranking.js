@@ -12,17 +12,15 @@ function Ranking() {
   }
 
   const [prompt, setPrompt] = useState('');
-  const numAnswers = 5;
+  const numAnswers = 4;
   const [data, setData] = useState([{"group":"group1", "items":[]},
                                     {"group":"group2", "items":[]},
                                     {"group":"group3", "items":[]},
                                     {"group":"group4", "items":[]},
-                                    {"group":"group5", "items":[]},
                                     {"group":"Rank 1 (best)", "items":[]},
                                     {"group":"Rank 2", "items":[]},
                                     {"group":"Rank 3", "items":[]},
-                                    {"group":"Rank 4", "items":[]},
-                                    {"group":"Rank 5 (worst)", "items":[]}]);
+                                    {"group":"Rank 4 (worst)", "items":[]}]);
 
   return (
     <div className="App-header">

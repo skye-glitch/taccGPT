@@ -19,7 +19,7 @@ def process_response(response):
     output = output.replace("<|endoftext|></s>", "").replace("-- <|endoftext|>", "").replace("<|endoftext|>","")
     return output
 
-def create_chatbot(path, max_new_tokens):
+def create_taccgpt_chat(path, max_new_tokens):
     if os.path.exists(path):
         # Locally tokenizer loading has some issue, so we need to force download
         model_json = os.path.join(path, "config.json")
@@ -36,7 +36,7 @@ def create_chatbot(path, max_new_tokens):
     model_config = AutoConfig.from_pretrained(path)
     model = OPTForCausalLM.from_pretrained(path,
                                            from_tf=bool(".ckpt" in path),
-                                           config=model_config).half()
+                                           config=model_config)
 
     model.config.end_token_id = tokenizer.eos_token_id
     model.config.pad_token_id = model.config.eos_token_id
@@ -44,23 +44,55 @@ def create_chatbot(path, max_new_tokens):
     generator = pipeline("text-generation",
                          model=model,
                          tokenizer=tokenizer,
-                         device='cuda:0'
-                         torch_dtype=torch.float16)
+                         torch_dtype=torch.float32,
+                         device='cpu')
     
     async def chat(message, history):
         processed_input = f"Human: {message}\n Assistant: " # Deepspeed chat required format
         response = generator(processed_input, do_sample=True, max_new_tokens=max_new_tokens)
         processed_response = process_response(response)
         
-        # res = await add_one_qa_pair({"prompt":message, "user":user_email if user_email else "Anonymous", "answer":processed_response})
-        # print("res:",res)
-
-        res = requests.post(url="http://0.0.0.0:9990/record_one_qa_pair/", params={"prompt":message, "user": "Anonymous", "answer":processed_response})
+        res = requests.post(url="http://backend:9990/record_one_qa_pair/", data={"prompt":message, "user": user_email if user_email else "Anonymous", "answer":processed_response})
 
         ## streaming reply effect (implemented below in the Blocks())
         for i in range(len(processed_response)):
             time.sleep(0.02)
             yield processed_response[:i+1]
         # return processed_response
-
+    
     return chat
+
+def create_taccgpt_rank(path, max_new_tokens):
+    if os.path.exists(path):
+        # Locally tokenizer loading has some issue, so we need to force download
+        model_json = os.path.join(path, "config.json")
+        if os.path.exists(model_json):
+            model_json_file = json.load(open(model_json))
+            model_name = model_json_file["_name_or_path"]
+            tokenizer = AutoTokenizer.from_pretrained(model_name,
+                                                      fast_tokenizer=True)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(path, fast_tokenizer=True)
+
+    tokenizer.pad_token = tokenizer.eos_token
+
+    model_config = AutoConfig.from_pretrained(path)
+    model = OPTForCausalLM.from_pretrained(path,
+                                           from_tf=bool(".ckpt" in path),
+                                           config=model_config)
+
+    model.config.end_token_id = tokenizer.eos_token_id
+    model.config.pad_token_id = model.config.eos_token_id
+    model.resize_token_embeddings(len(tokenizer))
+    generator = pipeline("text-generation",
+                         model=model,
+                         tokenizer=tokenizer,
+                         torch_dtype=torch.float16)
+    
+    def generate_answers(message, numAnswers):
+        message_repeated = [f"Human: {message}\n Assistant: " for _ in range(numAnswers)]
+
+        res = [process_response(x) for x in generator(message_repeated, temperature=0.9, top_p=0.9, do_sample=True, max_new_tokens=max_new_tokens)]
+        return res
+
+    return generate_answers

@@ -32,10 +32,10 @@ app = FastAPI()
 HTTP_HOST="0.0.0.0"
 HTTP_PORT=9990
 
-origins = ["http://localhost:3000",
-           "http://lcoalhost:3001",
-           "http://lcoalhost:9991",
-           "http://lcoalhost:9991/TACC_GPT"]
+origins = ["http://frontend:3000",
+           "http://localhost:3000",
+           "http://frontend_gradio:9995",
+           "http://frontend_gradio:9995/TACC_GPT"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,21 +45,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="/etc/backend/static"), name="static")
-templates = Jinja2Templates(directory="/etc/backend/templates")
+app.mount("/static", StaticFiles(directory="./static"), name="static")
+templates = Jinja2Templates(directory="./templates")
 
 @app.get('/')
 def root():
-    TACC_GPT_url = "http://0.0.0.0:9991/TACC_GPT"
+    TACC_GPT_url = "http://frontend_gradio:9995/TACC_GPT"
     return RedirectResponse(url=TACC_GPT_url)
-
-@app.post('/submit_prompt/',response_model=Answers)
-def submit_propmt(message:PromptWNumAnswers):
-    res = []
-    # dummy answers TODO: change to response with chat(message.prompt)
-    for i in range(message.numAnswers):
-        res.append(f"Rank {i} result (prompt: {message.prompt})")
-    return Answers(answers=res)
 
 @app.post('/submit_ranking/', response_model=ResponseMessage)
 async def submit_ranking(ranking_results:RankingResults):

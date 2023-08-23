@@ -1,6 +1,5 @@
 .App {
   text-align: center;
-  /* background-color: #282c34; */
 }
 
 .App-header {
@@ -32,7 +31,7 @@
   display: grid;
   width: 100%;
   height: 100%;
-  grid-template-columns: repeat(auto-fill, 19%);
+  grid-template-columns: repeat(auto-fill, 24%); /*change here if you changed the number of textarea or props.numAnswers*/
   align-items: start;
   padding-bottom: 0.5rem;
 }
@@ -67,9 +66,9 @@
   color: #282c34;
   background-color: white;
   border-radius: 5px;
-  min-height: 150px;
+  min-height: 250px;
   line-break: auto;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .dnd-card * {

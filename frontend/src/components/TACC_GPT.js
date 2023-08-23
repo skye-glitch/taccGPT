@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 function TACC_GPT() {
   useEffect(() => {
-    window.location.replace('http://0.0.0.0:9991/TACC_GPT');
+    window.location.replace('http://localhost:9995/TACC_GPT');
   }, [])
 }
 

@@ -2,24 +2,54 @@ import gradio as gr
 import uvicorn
 from fastapi import FastAPI
 import argparse
+from fastapi.middleware.cors import CORSMiddleware
 
-from load_ml_model import create_chatbot
+from load_ml_model import create_taccgpt_rank, create_taccgpt_chat
 from fastapi.responses import RedirectResponse
+from models import Answers, PromptWNumAnswers
 
 CUSTOM_PATH = "/TACC_GPT"
 app = FastAPI()
+
+
+origins = ["http://frontend:3000",
+           "http://localhost:3000"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+global generate_multiple_answers
 
 @app.get('/')
 def root():
     return RedirectResponse(url=CUSTOM_PATH)
 
+@app.post('/submit_prompt/',response_model=Answers)
+def submit_propmt(message:PromptWNumAnswers):
+    global generate_multiple_answers
+    res = generate_multiple_answers(message.prompt, message.numAnswers)
+    return Answers(answers=res)
+
+def load_taccgpt_rank(args):
+    global generate_multiple_answers
+    generate_multiple_answers = create_taccgpt_rank(args.path, args.max_new_tokens)
+
 def mount_gradio_ChatInterface(args):
-    global chat
-    chat = create_chatbot(args.path, args.max_new_tokens)
+    global generate_multiple_answers
+    chat = create_taccgpt_chat(args.path, args.max_new_tokens)
+
+    assert generate_multiple_answers is not chat
+
     tacc_gpt_interface = gr.ChatInterface(fn=chat,
-                      chatbot=gr.Chatbot(height=800,show_copy_button=True),
+                      chatbot=gr.Chatbot(height=700,show_copy_button=True),
                       textbox=gr.Textbox(placeholder="Welcome to use TACC GPT, please type your question here.", 
-                                         container=False, scale=15),
+                                         container=False, scale=20),
                       title="TACC GPT",
                       theme="soft")
     tacc_gpt_interface = tacc_gpt_interface.queue()
@@ -41,12 +71,15 @@ def parse_args():
         help="Maximum new tokens to generate per response",
     )
     parser.add_argument('--http_host', default='0.0.0.0')
-    parser.add_argument('--http_port', type=int, default=9991)
+    parser.add_argument('--http_port', type=int, default=9995)
     args = parser.parse_args()
     return args
 
 
 if __name__ == '__main__':
     args = parse_args()
+
+    load_taccgpt_rank(args)
+
     server = mount_gradio_ChatInterface(args)
     server.run()

@@ -16,9 +16,9 @@ services:
       - "9990:9990"
     restart: always
     volumes:
-      - ./backend/main.py:/etc/backend/main.py
-      - ./backend/models.py:/etc/backend/models.py
-      - ./backend/database.py:/etc/backend/database.py
+      - ./backend/main.py:/etc/backend/main.py:ro
+      - ./backend/models.py:/etc/backend/models.py:ro
+      - ./backend/database.py:/etc/backend/database.py:ro
 
   frontend:
     container_name: frontend
@@ -35,17 +35,8 @@ services:
     build: ./frontend_gradio
     ports:
       - "9991:9991"
-    # image: anibali/pytorch:2.0.0-cuda11.8
     image: pytorch/pytorch:latest
     restart: always
     volumes:
       - ./frontend_gradio/main.py:/etc/TACC_GPT/main.py
       - ./frontend_gradio/load_ml_model.py:/etc/TACC_GPT/load_ml_model.py
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            count: 3
-            device_ids: ['0','1','2']
-            capabilities: [gpu]
