@@ -34,7 +34,7 @@ services:
     container_name: frontend_gradio
     build: ./frontend_gradio
     ports:
-      - "9991:9991"
+      - "9995:9995"
     image: pytorch/pytorch:latest
     restart: always
     volumes:
