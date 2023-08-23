@@ -4,4 +4,4 @@ pandas
 requests
 uvicorn
 fastapi
-transformers
+transformers==4.31.0
