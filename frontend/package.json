@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ariakit/react": "^0.2.17",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
     "axios": "^1.4.0",
     "bootstrap": "^5.3.1",
     "framer-motion": "^10.16.1",

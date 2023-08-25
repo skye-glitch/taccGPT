@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-
+import DropDown from "./DatabaseDropDown.tsx"
+import * as Ariakit from "@ariakit/react";
 const Header = (props) => {
   const navigate = useNavigate();
   
@@ -11,21 +12,28 @@ const Header = (props) => {
       </Logo>
       <NavMenu>
         <a onClick={()=>{navigate("/")}}>
+          <Ariakit.Button className="button">
           <img src="/images/home-1-svgrepo-com.svg" alt="HOME" />
-          <span>HOME</span>
-        </a>
-        <a onClick={() => navigate("/TACC_GPT")}>
-          <img src="/images/robot-svgrepo-com.svg" alt="TACC GPT" />
-          <span>TACC GPT</span>
-        </a>
-        <a onClick={() => navigate("/Ranking")}>
-          <img src="/images/ranking-icon.svg" alt="RANKING" />
-          <span>Ranking</span>
+            HOME
+          </Ariakit.Button>
         </a>
 
-        <a onClick={() => navigate("/Database")}>
-          <img src="/images/database-icon.svg" alt="DATABASE" />
-          <span>Database</span>
+        <a onClick={() => navigate("/TACC_GPT")}>
+          <Ariakit.Button className="button">
+          <img src="/images/robot-svgrepo-com.svg" alt="TACC GPT" />
+            TACC GPT
+          </Ariakit.Button>
+        </a>
+
+        <a onClick={() => navigate("/Ranking")}>
+          <Ariakit.Button className="button">
+            <img src="/images/ranking-icon.svg" alt="RANKING" />
+            Ranking
+          </Ariakit.Button>
+        </a>
+
+        <a>
+          <DropDown />
         </a>
       </NavMenu>
       {/* {!userName? (<Login onClick={() => {navigate("/Login")}}>Login</Login>):(
