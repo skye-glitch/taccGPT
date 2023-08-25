@@ -22,6 +22,11 @@ const Header = (props) => {
           <img src="/images/ranking-icon.svg" alt="RANKING" />
           <span>Ranking</span>
         </a>
+
+        <a onClick={() => navigate("/Database")}>
+          <img src="/images/database-icon.svg" alt="DATABASE" />
+          <span>Database</span>
+        </a>
       </NavMenu>
       {/* {!userName? (<Login onClick={() => {navigate("/Login")}}>Login</Login>):(
         <SignOut>

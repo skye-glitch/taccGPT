@@ -1,13 +1,9 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
-class QA_pair(BaseModel):
-    prompt: str
-    answer: str
-    user: str
-
 class PromptWNumAnswers(BaseModel):
     prompt: str
+    user:str
     numAnswers:int
 
 class Prompt(BaseModel):
@@ -22,8 +18,27 @@ class RankingResult(BaseModel):
 
 class RankingResults(BaseModel):
     prompt: str 
+    user: str
     rankings: List[RankingResult]
 
 class ResponseMessage(BaseModel):
     success: bool
     message: Optional[str] = None
+
+class QaPair(BaseModel):
+    prompt:str
+    answer:str
+    user:str
+    date:str
+
+class QaPairs(BaseModel):
+    qaPairs:List[QaPair]
+
+class Ranking(BaseModel):
+    prompt:str
+    user:str
+    date:str
+    answers:List[List[str]]
+
+class Rankings(BaseModel):
+    rankings:List[Ranking]

@@ -3,7 +3,6 @@ WORKDIR /etc/frontend
 
 COPY package.json .
 RUN npm i --save react-select
-# RUN yarn install --ignore-engines
 RUN yarn install
 COPY . .
 EXPOSE 3000

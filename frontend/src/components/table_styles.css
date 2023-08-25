@@ -17,7 +17,9 @@ h2{
 }
 
 /* Table Styles */
-
+.QA-pairs-wrapper{
+    margin-top: 80px;
+}
 
 .table-wrapper{
     table-layout:auto;
@@ -26,6 +28,7 @@ h2{
 }
 
 .fl-table {
+    margin-top: 120px;
     border-radius: 5px;
     font-size: 15px;
     font-weight: normal;

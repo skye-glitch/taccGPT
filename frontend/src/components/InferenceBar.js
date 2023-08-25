@@ -21,7 +21,8 @@ const InferenceBar = props => {
     const elem = document.getElementsByClassName("loading-btn-wrapper")[0].querySelector("button");
     elem.classList.add(pendingClassName);
 
-    axios.post('http://localhost:9991/submit_prompt/',{'prompt':prompt,'numAnswers':props.numAnswers}).then(res => {
+    // for test locally only: http://localhost:9990/submit_prompt/
+    axios.post('http://localhost:9991/submit_prompt/',{'prompt':prompt,'numAnswers':props.numAnswers, 'user':'Anonymous'}).then(res => {
 
     window.setTimeout(() => {
       elem.classList.remove(pendingClassName);

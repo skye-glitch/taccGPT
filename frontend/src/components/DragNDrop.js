@@ -6,6 +6,7 @@ function DragNDrop(props){
   const dragNode = useRef();
   const [dragging, setDragging] = useState(false);
   const [show, setShow] = useState(false);
+  const [user, setUser] = useState(null);
 
   function constructDefaultPropsData() {
     let newData = JSON.parse(JSON.stringify(props.data));
@@ -99,11 +100,11 @@ function DragNDrop(props){
 
   function submitRankingResult() {
     const groups = document.getElementsByClassName("dnd-group");
-    const rankingResults = {"prompt":props.prompt,"rankings":[]};
+    const rankingResults = {"prompt":props.prompt,"rankings":[],"user":user?user:"Anonymous"};
     let count = 0;
     for(let i = props.numAnswers; i < props.numAnswers*2; i++) {
       const textareas=groups[i].querySelectorAll("textarea");
-      const rankingResult = {"rank":i-props.numAnswers, "rankingAnswers":[]};
+      const rankingResult = {"rank":i-props.numAnswers+1, "rankingAnswers":[]};
       if(textareas !== null){
         for(let j = 0; j < textareas.length; j++) {
           rankingResult["rankingAnswers"][j] = String(textareas[j].value)

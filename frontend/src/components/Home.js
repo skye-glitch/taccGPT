@@ -1,11 +1,16 @@
 import React from "react";
 import styled from "styled-components";
-
+import {motion} from "framer-motion"
 function Home() {
   return (
-    <Container>
-      <p>Welcome to use TACC GPT!</p>
-    </Container>
+    <motion.div className="ranking-container"
+    initial={{opacity: 0}}
+    animate={{opacity: 1}}
+    transition={{delay:0.6, duration:0.6}}>
+      <Container>
+        <p>Welcome to use TACC GPT!</p>
+      </Container>
+    </motion.div>
   )
     
 }

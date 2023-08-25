@@ -4,6 +4,7 @@ import json
 import time
 import sys
 import requests
+from datetime import datetime
 from transformers import pipeline
 from transformers import AutoConfig, OPTForCausalLM, AutoTokenizer
 
@@ -52,7 +53,10 @@ def create_taccgpt_chat(path, max_new_tokens):
         response = generator(processed_input, do_sample=True, max_new_tokens=max_new_tokens)
         processed_response = process_response(response)
         
-        res = requests.post(url="http://backend:9990/record_one_qa_pair/", data={"prompt":message, "user": user_email if user_email else "Anonymous", "answer":processed_response})
+        res = requests.post(url="http://backend:9990/record_one_qa_pair/", data={"date":datetime.now().strftime("%Y %m %d"), 
+                                                                                 "prompt":message, 
+                                                                                 "user": user_email if user_email else "Anonymous", 
+                                                                                 "answer":processed_response})
 
         ## streaming reply effect (implemented below in the Blocks())
         for i in range(len(processed_response)):
