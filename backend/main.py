@@ -37,6 +37,7 @@ user=None
 
 origins = ["http://frontend:3000",
            "http://localhost:3000",
+           "http://localhost:9991",
            "http://frontend_gradio:9991",
            "http://frontend_gradio:9991/TACC_GPT"]
 
@@ -53,25 +54,24 @@ templates = Jinja2Templates(directory="./templates")
 
 @app.get('/')
 def root():
-    TACC_GPT_url = "http://frontend_gradio:9995/TACC_GPT"
+    TACC_GPT_url = "http://frontend_gradio:9991/TACC_GPT"
     return RedirectResponse(url=TACC_GPT_url)
 
-# For test InferenceBar.js locally only
-# @app.post('/submit_ranking/', response_model=ResponseMessage)
-# async def submit_ranking(ranking_results:RankingResults):
-#     res = await add_one_ranking(ranking_results)
-#     return ResponseMessage(success=True if res else False, message="successful")
+@app.post('/submit_ranking/', response_model=ResponseMessage)
+async def submit_ranking(ranking_results:RankingResults):
+    res = await add_one_ranking(ranking_results)
+    return ResponseMessage(success=True if res else False, message="successful")
 
 @app.post('/record_one_qa_pair/', response_model=ResponseMessage)
 async def record_one_qa_pair(qa_pair:QaPair):
     res = await add_one_qa_pair(qa_pair)
     return ResponseMessage(success=True if res else False, message="successful")
 
-@app.post('/submit_prompt/', response_model=Answers)
-def submit_prompt(message:PromptWNumAnswers):
-    print(message)
-    # return chat(message, None)
-    return Answers(answers=[f"Rank {i} result" for i in range(message.numAnswers)])
+# For testing InferenceBar.js only
+# @app.post('/submit_prompt/', response_model=Answers)
+# def submit_prompt(message:PromptWNumAnswers):
+#     print(message)
+#     return Answers(answers=[f"Rank {i} result" for i in range(message.numAnswers)])
 
 @app.get("/get_all_qa_pairs", response_model=QaPairs)
 async def get_all_qa_pairs(request: Request):
@@ -81,7 +81,6 @@ async def get_all_qa_pairs(request: Request):
 @app.get("/get_all_rankings", response_model=Rankings)
 async def get_all_rankings(request: Request):
     rankings_db = await fetch_all_rankings()
-    print(rankings_db)
     return Rankings(rankings=rankings_db)
 
 # @app.get("/show_database_QA_collections")

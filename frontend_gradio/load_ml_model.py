@@ -8,10 +8,6 @@ from datetime import datetime
 from transformers import pipeline
 from transformers import AutoConfig, OPTForCausalLM, AutoTokenizer
 
-# TODO: change direct call to fastapi call
-# sys.path.append("../backend_db")
-# from backend_db.database import add_one_qa_pair
-
 user_email = None
 
 def process_response(response):
@@ -52,11 +48,11 @@ def create_taccgpt_chat(path, max_new_tokens):
         processed_input = f"Human: {message}\n Assistant: " # Deepspeed chat required format
         response = generator(processed_input, do_sample=True, max_new_tokens=max_new_tokens)
         processed_response = process_response(response)
-        
-        res = requests.post(url="http://backend:9990/record_one_qa_pair/", data={"date":datetime.now().strftime("%Y %m %d"), 
-                                                                                 "prompt":message, 
-                                                                                 "user": user_email if user_email else "Anonymous", 
-                                                                                 "answer":processed_response})
+        qa_pair = {"date":datetime.now().strftime("%Y %m %d"), 
+                   "prompt":message, 
+                   "user":user_email if user_email else "Anonymous", 
+                   "answer":processed_response}
+        res = requests.post(url="http://backend:9990/record_one_qa_pair/", json=qa_pair)
 
         ## streaming reply effect (implemented below in the Blocks())
         for i in range(len(processed_response)):

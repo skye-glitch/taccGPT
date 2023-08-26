@@ -113,8 +113,8 @@ function DragNDrop(props){
         rankingResults["rankings"][i-props.numAnswers] = rankingResult
       }
     }
-    if(count === props.numAnswers) console.log(rankingResults["rankings"]);
-    else console.log("props.numAnswers",props.numAnswers,"count",count);
+    // if(count === props.numAnswers) console.log(rankingResults["rankings"]);
+    // else console.log("props.numAnswers",props.numAnswers,"count",count);
 
     // Send the ranking result to the backend
     axios.post('http://localhost:9990/submit_ranking/', 

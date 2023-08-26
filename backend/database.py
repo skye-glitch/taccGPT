@@ -1,14 +1,11 @@
 import motor.motor_asyncio
 from models import (QaPair, 
                     Ranking,
-                    RankingResults, 
-                    Rankings, 
-                    Answers, 
-                    RankingResult)
+                    RankingResults)
 from datetime import datetime
 
-# client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://database:27017")
-client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017")
+client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://database:27017")
+# client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017")
 db = client["TACC_GPT"]
 qa_collection = db["QA"]
 ranking_collection = db['ranking']

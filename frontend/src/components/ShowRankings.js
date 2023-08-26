@@ -11,7 +11,7 @@ function ShowRankings(){
 
   const fetchData = async() =>{
     axios.get("http://localhost:9990/get_all_rankings").then(res => {
-      console.log(res.data.rankings)
+      // console.log(res.data.rankings)
       setRankings(res.data.rankings)
     })
   }
