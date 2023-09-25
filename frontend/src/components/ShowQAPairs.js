@@ -13,7 +13,8 @@ function ShowQAParis(){
   }, [])
 
   const fetchData = async() =>{
-    axios.get("http://localhost:9990/get_all_qa_pairs").then(res => {
+    // http://localhost:9990/get_all_qa_pairs
+    axios.get("/backend/get_all_qa_pairs").then(res => {
       // console.log(res.data.qaPairs)
       setQaPairs(res.data.qaPairs)
     })

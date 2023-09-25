@@ -10,7 +10,8 @@ function ShowRankings(){
   }, [])
 
   const fetchData = async() =>{
-    axios.get("http://localhost:9990/get_all_rankings").then(res => {
+    // http://localhost:9990/get_all_rankings
+    axios.get("/backend/get_all_rankings").then(res => {
       // console.log(res.data.rankings)
       setRankings(res.data.rankings)
     })

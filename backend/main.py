@@ -39,7 +39,9 @@ origins = ["http://frontend:3000",
            "http://localhost:3000",
            "http://localhost:9991",
            "http://frontend_gradio:9991",
-           "http://frontend_gradio:9991/TACC_GPT"]
+           "http://frontend_gradio:9991/TACC_GPT",
+           "http://localhost/",
+           "http://localhost/Ranking"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -54,7 +56,7 @@ templates = Jinja2Templates(directory="./templates")
 
 @app.get('/')
 def root():
-    TACC_GPT_url = "http://frontend_gradio:9991/TACC_GPT"
+    TACC_GPT_url = "/TACC_GPT_UI"
     return RedirectResponse(url=TACC_GPT_url)
 
 @app.post('/submit_ranking/', response_model=ResponseMessage)
@@ -67,11 +69,11 @@ async def record_one_qa_pair(qa_pair:QaPair):
     res = await add_one_qa_pair(qa_pair)
     return ResponseMessage(success=True if res else False, message="successful")
 
-# For testing InferenceBar.js only
+## For testing InferenceBar.js only
+## The real method has been moved to ./frontend_gradio/main.py
 # @app.post('/submit_prompt/', response_model=Answers)
 # def submit_prompt(message:PromptWNumAnswers):
-#     print(message)
-#     return Answers(answers=[f"Rank {i} result" for i in range(message.numAnswers)])
+#     return Answers(answers=[f"Unranked {i} result" for i in range(message.numAnswers)])
 
 @app.get("/get_all_qa_pairs", response_model=QaPairs)
 async def get_all_qa_pairs(request: Request):

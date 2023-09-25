@@ -2,10 +2,11 @@
 # FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
 # FROM pytorch/pytorch:latest
 
-From python:3.9
+FROM python:3.9
 WORKDIR /etc/TACC_GPT
 
 COPY ./requirements.txt ./
+RUN python3 -m pip install --upgrade pip
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 RUN pip install -r requirements.txt
 COPY . .

@@ -8,12 +8,13 @@ from load_ml_model import create_taccgpt_rank, create_taccgpt_chat
 from fastapi.responses import RedirectResponse
 from models import Answers, PromptWNumAnswers
 
-CUSTOM_PATH = "/TACC_GPT"
+CUSTOM_PATH = "/TACC_GPT_UI"
 app = FastAPI()
 
 
 origins = ["http://frontend:3000",
-           "http://localhost:3000"]
+           "http://localhost:3000",
+           "http://localhost/Ranking"]
 
 app.add_middleware(
     CORSMiddleware,

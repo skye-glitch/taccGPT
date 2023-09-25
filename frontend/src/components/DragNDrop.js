@@ -117,7 +117,8 @@ function DragNDrop(props){
     // else console.log("props.numAnswers",props.numAnswers,"count",count);
 
     // Send the ranking result to the backend
-    axios.post('http://localhost:9990/submit_ranking/', 
+    // local test w/o nginx: http://localhost:9990/submit_ranking/
+    axios.post('/TACC_GPT/submit_ranking/', 
                rankingResults ).then(res =>{
       const stateDuration = 1500;
       const pendingClassName = 'loading-btn--pending';

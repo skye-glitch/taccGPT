@@ -1,5 +1,21 @@
 version: '3.9'
 services:
+  nginx:
+    container_name: nginx
+    restart: always
+    image: nginx:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+      - database
+      - frontend_gradio
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - taccgpt_network
+
   database:
     container_name: database
     image: mongo
@@ -8,17 +24,24 @@ services:
     ports:
       - "27017:27017"
     restart: always
+    networks:
+      - taccgpt_network
+
 
   backend:
     container_name: backend
     build: ./backend
     ports:
-      - "9990:9990"
+      - "19990:9990"
     restart: always
     volumes:
       - ./backend/main.py:/etc/backend/main.py:ro
       - ./backend/models.py:/etc/backend/models.py:ro
       - ./backend/database.py:/etc/backend/database.py:ro
+    depends_on:
+      - database
+    networks:
+      - taccgpt_network
 
   frontend:
     container_name: frontend
@@ -29,10 +52,18 @@ services:
     volumes:
       - ./frontend/src:/etc/frontend/src:ro
       - ./frontend/public/images:/etc/frontend/images:ro
+    networks:
+      - taccgpt_network
 
   frontend_gradio:
     container_name: frontend_gradio
     build: ./frontend_gradio
     ports:
-      - "9991:9991"
+      - "19991:9991"
     restart: always
+    networks:
+      - taccgpt_network
+  
+networks:
+  taccgpt_network:
+    driver: bridge

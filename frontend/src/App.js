@@ -26,7 +26,7 @@ function App() {
             <Route path='/ranking' element={<Ranking />}></Route>
           </Route>
 
-          <Route path='/TACC_GPT' element={<TACC_GPT />} />
+          <Route path='/TACC_GPT_UI' element={<TACC_GPT />} />
 
           {/* <Route exact path='/database'>
             <Route path='/database' element={<Database />} />

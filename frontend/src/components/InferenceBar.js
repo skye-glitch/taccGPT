@@ -22,7 +22,7 @@ const InferenceBar = props => {
     elem.classList.add(pendingClassName);
 
     // for test locally only: http://localhost:9990/submit_prompt/
-    axios.post('http://localhost:9991/submit_prompt/',{'prompt':prompt,'numAnswers':props.numAnswers, 'user':'Anonymous'}).then(res => {
+    axios.post('/TACC_GPT/submit_prompt/',{'prompt':prompt,'numAnswers':props.numAnswers, 'user':'Anonymous'}).then(res => {
 
     window.setTimeout(() => {
       elem.classList.remove(pendingClassName);
