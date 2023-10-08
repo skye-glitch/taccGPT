@@ -1,0 +1,3 @@
+[submodule "taccgpt_frontend"]
+	path = taccgpt_frontend
+	url = https://github.com/zhengmk321/taccgpt_frontend.git
