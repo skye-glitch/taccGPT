@@ -5,3 +5,6 @@ requests
 uvicorn
 fastapi
 transformers==4.31.0
+langchain
+redis
+sse_starlette 

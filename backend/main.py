@@ -1,5 +1,6 @@
 import uvicorn
-
+import random
+import json
 
 import pandas as pd
 
@@ -18,7 +19,8 @@ from fastapi.templating import Jinja2Templates
 from database import (fetch_all_qa_pairs,
                       fetch_all_rankings,
                       add_one_ranking,
-                      add_one_qa_pair)
+                      add_one_qa_pair,
+                      get_random_prompt)
 # from load_ml_model import create_chatbot
 
 from models import (QaPair,
@@ -34,6 +36,7 @@ app = FastAPI()
 HTTP_HOST="0.0.0.0"
 HTTP_PORT=9990
 user=None
+JSON_FILE = "./prompt_data/first_prompts.json"
 
 origins = ["http://frontend:3000",
            "http://localhost:3000",
@@ -58,6 +61,12 @@ templates = Jinja2Templates(directory="./templates")
 def root():
     TACC_GPT_url = "/TACC_GPT_UI"
     return RedirectResponse(url=TACC_GPT_url)
+
+@app.get('/get_random_question')
+async def get_random_question():
+    res = await get_random_prompt()
+    return ResponseMessage(success=True if res else False, message=res)
+    
 
 @app.post('/submit_ranking/', response_model=ResponseMessage)
 async def submit_ranking(ranking_results:RankingResults):

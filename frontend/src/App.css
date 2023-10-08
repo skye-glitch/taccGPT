@@ -82,7 +82,7 @@
 }
 
 .inference-wrapper textarea{
-  width: 60%;
+  width: 70%;
   height: 400px;
   margin: 0.5rem;
   border-radius: 0.5rem;
@@ -195,9 +195,10 @@ textarea::-webkit-scrollbar{
 
 .loading-btn-wrapper {
   display: inline-block;
-  width: 60%;
+  width: 35%;
   height: 60px;
   text-align: center;
+  padding-left: 20px;
 }
 
 .loading-btn {

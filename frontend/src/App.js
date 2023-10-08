@@ -6,7 +6,7 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom"
 import Ranking from './components/Ranking';
 import Home from './components/Home'
 import Header from './components/Header';
-import TACC_GPT from './components/TACC_GPT';
+import TACC_GPT_UI from './components/TACC_GPT_UI';
 // import Database from './components/Database';
 import ShowQAParis from './components/ShowQAPairs';
 import ShowRankings from './components/ShowRankings';
@@ -26,7 +26,7 @@ function App() {
             <Route path='/ranking' element={<Ranking />}></Route>
           </Route>
 
-          <Route path='/TACC_GPT_UI' element={<TACC_GPT />} />
+          <Route path='/TACC_GPT_UI' element={<TACC_GPT_UI />} />
 
           {/* <Route exact path='/database'>
             <Route path='/database' element={<Database />} />

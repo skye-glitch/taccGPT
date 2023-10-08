@@ -15,6 +15,15 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     networks:
       - taccgpt_network
+  
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - taccgpt_network
+    restart: always
 
   database:
     container_name: database
@@ -43,15 +52,34 @@ services:
     networks:
       - taccgpt_network
 
+  # frontend:
+  #   container_name: frontend
+  #   build: ./frontend
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend/src:/etc/frontend/src:ro
+  #     - ./frontend/public/images:/etc/frontend/images:ro
+  #   networks:
+  #     - taccgpt_network
+
   frontend:
     container_name: frontend
-    build: ./frontend
+    build: ./taccgpt_frontend
     restart: always
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend/src:/etc/frontend/src:ro
-      - ./frontend/public/images:/etc/frontend/images:ro
+      - ./taccgpt_frontend/components:/app/components:ro
+      - ./taccgpt_frontend/hooks:/app/hooks:ro
+      - ./taccgpt_frontend/pages:/app/pages:ro
+      - ./taccgpt_frontend/services:/app/services:ro
+      - ./taccgpt_frontend/styles:/app/styles:ro
+      - ./taccgpt_frontend/types:/app/types:ro
+      - ./taccgpt_frontend/utils/app:/app/utils/app:ro
+      - ./taccgpt_frontend/utils/data:/app/utils/data:ro
+      - ./taccgpt_frontend/utils/server:/app/utils/server:ro
     networks:
       - taccgpt_network
 
@@ -59,10 +87,17 @@ services:
     container_name: frontend_gradio
     build: ./frontend_gradio
     ports:
-      - "19991:9991"
+      - "19991:9990"
     restart: always
     networks:
       - taccgpt_network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
   
 networks:
   taccgpt_network:

@@ -6,9 +6,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from load_ml_model import create_taccgpt_rank, create_taccgpt_chat
 from fastapi.responses import RedirectResponse
-from models import Answers, PromptWNumAnswers
+from models import Answers, PromptWNumAnswers, Answer, ChatBody
+from sse_starlette import EventSourceResponse
+import time
+from fastapi.responses import StreamingResponse
 
-CUSTOM_PATH = "/TACC_GPT_UI"
+from threading import Thread, BoundedSemaphore
+
+# CUSTOM_PATH = "/TACC_GPT_UI"
 app = FastAPI()
 
 
@@ -24,12 +29,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+chatbot = None
+generate_multiple_answers = None
+NUM_THREADS_ALLOWED = 2
+threadLimiter = BoundedSemaphore(NUM_THREADS_ALLOWED) # limit the number of running threads
 
-global generate_multiple_answers
+# @app.get('/')
+# def root():
+#     return RedirectResponse(url=CUSTOM_PATH)
 
-@app.get('/')
-def root():
-    return RedirectResponse(url=CUSTOM_PATH)
+@app.post('/chatbot/')
+async def chat(chatMessage:ChatBody):
+    processed_message = ''
+    for message in chatMessage.messages:
+        processed_message = processed_message + f" {message.role}: {message.content}\n"
+
+    processed_message = processed_message + " Assistant: "
+
+    threadLimiter.acquire()
+    try:
+        content=chatbot(processed_message, chatMessage.temperature)
+    finally:
+        threadLimiter.release()
+    return EventSourceResponse(sep="\r\n",
+                               status_code=200,
+                               content=content,
+                            #    content=chatbot(processed_message, chatMessage.temperature),
+                               headers={'Content-Type': 'text/plain',})
+    #ping=600  
+
+
 
 @app.post('/submit_prompt/',response_model=Answers)
 def submit_propmt(message:PromptWNumAnswers):
@@ -41,24 +70,27 @@ def load_taccgpt_rank(args):
     global generate_multiple_answers
     generate_multiple_answers = create_taccgpt_rank(args.path, args.max_new_tokens)
 
-def mount_gradio_ChatInterface(args):
-    global generate_multiple_answers
-    chat = create_taccgpt_chat(args.path, args.max_new_tokens)
+def load_taccgpt_chatbot(args):
+    global chatbot
+    chatbot = create_taccgpt_chat(args.path, args.max_new_tokens)
 
-    assert generate_multiple_answers is not chat
+# def mount_gradio_ChatInterface(args):
+#     global chatbot
+#     chatbot = create_taccgpt_chat(args.path, args.max_new_tokens)
 
-    tacc_gpt_interface = gr.ChatInterface(fn=chat,
-                      chatbot=gr.Chatbot(height=700,show_copy_button=True),
-                      textbox=gr.Textbox(placeholder="Welcome to use TACC GPT, please type your question here.", 
-                                         container=False, scale=20),
-                      title="TACC GPT",
-                      theme="soft")
-    tacc_gpt_interface = tacc_gpt_interface.queue()
-    chatbot_app = gr.mount_gradio_app(app, tacc_gpt_interface, path=CUSTOM_PATH, gradio_api_url=f"http://{args.http_host}:{args.http_port}{CUSTOM_PATH}/")
+#     tacc_gpt_interface = gr.ChatInterface(fn=chatbot,
+#                       chatbot=gr.Chatbot(height=700,show_copy_button=True),
+#                       textbox=gr.Textbox(placeholder="Welcome to use TACC GPT, please type your question here.", 
+#                                          container=False, scale=20),
+#                       title="TACC GPT",
+#                       theme="soft")
+#     tacc_gpt_interface = tacc_gpt_interface.queue()
+#     chatbot_app = gr.mount_gradio_app(app, tacc_gpt_interface, path=CUSTOM_PATH, gradio_api_url=f"http://{args.http_host}:{args.http_port}{CUSTOM_PATH}/")
 
-    config = uvicorn.Config(chatbot_app, host=args.http_host, port=args.http_port, log_level="debug", reload=True)
-    server = uvicorn.Server(config=config)
-    return server
+#     # config = uvicorn.Config(chatbot_app, host=args.http_host, port=args.http_port, log_level="debug", reload=True)
+#     config = uvicorn.Config(app, host=args.http_host, port=args.http_port, reload=True)
+#     server = uvicorn.Server(config=config)
+#     return server
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -72,7 +104,7 @@ def parse_args():
         help="Maximum new tokens to generate per response",
     )
     parser.add_argument('--http_host', default='0.0.0.0')
-    parser.add_argument('--http_port', type=int, default=9991)
+    parser.add_argument('--http_port', type=int, default=9990)
     args = parser.parse_args()
     return args
 
@@ -81,6 +113,9 @@ if __name__ == '__main__':
     args = parse_args()
 
     load_taccgpt_rank(args)
+    load_taccgpt_chatbot(args)
 
-    server = mount_gradio_ChatInterface(args)
+    # server = mount_gradio_ChatInterface(args)
+    config = uvicorn.Config(app, host=args.http_host, port=args.http_port, reload=True)
+    server = uvicorn.Server(config=config)
     server.run()

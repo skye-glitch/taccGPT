@@ -18,7 +18,7 @@ const Header = (props) => {
           </Ariakit.Button>
         </a>
 
-        <a onClick={() => navigate("/TACC_GPT")}>
+        <a onClick={() => navigate("/TACC_GPT_UI")}>
           <Ariakit.Button className="button">
           <img src="/images/robot-svgrepo-com.svg" alt="TACC GPT" />
             TACC GPT
