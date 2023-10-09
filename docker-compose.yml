@@ -10,7 +10,7 @@ services:
       - frontend
       - backend
       - database
-      - frontend_gradio
+      - backend_ml
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     networks:
@@ -83,9 +83,9 @@ services:
     networks:
       - taccgpt_network
 
-  frontend_gradio:
-    container_name: frontend_gradio
-    build: ./frontend_gradio
+  backend_ml:
+    container_name: backend_ml
+    build: ./backend_ml
     ports:
       - "19991:9990"
     restart: always

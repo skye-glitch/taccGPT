@@ -4,7 +4,8 @@ from fastapi import FastAPI
 import argparse
 from fastapi.middleware.cors import CORSMiddleware
 
-from load_ml_model import create_taccgpt_rank, create_taccgpt_chat
+# from load_ml_model import create_taccgpt_rank, create_taccgpt_chat
+from load_ml_model import create_taccgpt
 from fastapi.responses import RedirectResponse
 from models import Answers, PromptWNumAnswers, Answer, ChatBody
 from sse_starlette import EventSourceResponse
@@ -66,13 +67,17 @@ def submit_propmt(message:PromptWNumAnswers):
     res = generate_multiple_answers(message.prompt, message.numAnswers)
     return Answers(answers=res)
 
-def load_taccgpt_rank(args):
-    global generate_multiple_answers
-    generate_multiple_answers = create_taccgpt_rank(args.path, args.max_new_tokens)
+# def load_taccgpt_rank(args):
+#     global generate_multiple_answers
+#     generate_multiple_answers = create_taccgpt_rank(args.path, args.max_new_tokens)
 
-def load_taccgpt_chatbot(args):
-    global chatbot
-    chatbot = create_taccgpt_chat(args.path, args.max_new_tokens)
+# def load_taccgpt_chatbot(args):
+#     global chatbot
+#     chatbot = create_taccgpt_chat(args.path, args.max_new_tokens)
+
+def load_taccgpt(args):
+    global chatbot, generate_multiple_answers
+    chatbot, generate_multiple_answers = create_taccgpt(args.path,args.max_new_tokens)
 
 # def mount_gradio_ChatInterface(args):
 #     global chatbot
@@ -112,8 +117,11 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
 
-    load_taccgpt_rank(args)
-    load_taccgpt_chatbot(args)
+    # No enough memory to load two models into 3080 12GB, if model is opt-2.7B
+    # load_taccgpt_rank(args)
+    # load_taccgpt_chatbot(args)
+
+    load_taccgpt(args)
 
     # server = mount_gradio_ChatInterface(args)
     config = uvicorn.Config(app, host=args.http_host, port=args.http_port, reload=True)
