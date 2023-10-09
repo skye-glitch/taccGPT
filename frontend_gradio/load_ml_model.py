@@ -51,9 +51,14 @@ def create_taccgpt_chat(path, max_new_tokens):
     tokenizer.pad_token = tokenizer.eos_token
 
     model_config = AutoConfig.from_pretrained(path)
-    model = OPTForCausalLM.from_pretrained(path,
+    if torch.cuda.is_available():
+        model = OPTForCausalLM.from_pretrained(path,
                                            from_tf=bool(".ckpt" in path),
                                            config=model_config).half()
+    else:
+        model = OPTForCausalLM.from_pretrained(path,
+                                           from_tf=bool(".ckpt" in path),
+                                           config=model_config)
 
     model.config.end_token_id = tokenizer.eos_token_id
     model.config.pad_token_id = model.config.eos_token_id
@@ -63,7 +68,7 @@ def create_taccgpt_chat(path, max_new_tokens):
                     model=model,
                     tokenizer=tokenizer,
                     torch_dtype=torch.float16,
-                    device='cuda',
+                    device='cuda' if torch.cuda.is_available() else 'cpu',
                     max_new_tokens=max_new_tokens)
     
     # # LangChain
@@ -129,12 +134,12 @@ def create_taccgpt_chat(path, max_new_tokens):
                 if len(processed_token.replace(" ","")) == 0: 
                     continue
                 yield processed_token
-                time.sleep(0.05)
+                # time.sleep(0.05)
 
             # Remove the preceeding context, and only return the content following the last "Assistant:"
             if(re.search(r"Assistant:",token)):
                 seen_start_token = True
-        thread.join()
+        # thread.join()
         del streamer
 
     return chat
