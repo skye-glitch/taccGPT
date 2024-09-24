@@ -4,7 +4,7 @@ WORKDIR /etc/frontend
 COPY package.json .
 RUN npm i --save react-select
 RUN yarn install
-COPY . .
+#COPY . .
 EXPOSE 3000
 RUN npm i @types/react
 # RUN yarn build

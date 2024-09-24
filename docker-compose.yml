@@ -52,17 +52,6 @@ services:
     networks:
       - taccgpt_network
 
-  # frontend:
-  #   container_name: frontend
-  #   build: ./frontend
-  #   restart: always
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend/src:/etc/frontend/src:ro
-  #     - ./frontend/public/images:/etc/frontend/images:ro
-  #   networks:
-  #     - taccgpt_network
 
   frontend:
     container_name: frontend
@@ -91,6 +80,8 @@ services:
     restart: always
     networks:
       - taccgpt_network
+    volumes:
+      - ./backend_ml:/etc/TACC_GPT
     deploy:
       resources:
         reservations:
@@ -102,3 +93,4 @@ services:
 networks:
   taccgpt_network:
     driver: bridge
+

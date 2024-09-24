@@ -8,3 +8,14 @@ transformers==4.31.0
 langchain
 redis
 sse_starlette 
+langchain 
+langchain-community 
+langchainhub 
+langchain-openai 
+langchain-chroma 
+bs4
+protobuf
+accelerate
+unstructured
+markdown
+sentence-transformers

@@ -1,4 +1,4 @@
-import gradio as gr
+# import gradio as gr
 import uvicorn
 from fastapi import FastAPI
 import argparse
@@ -41,6 +41,9 @@ threadLimiter = BoundedSemaphore(NUM_THREADS_ALLOWED) # limit the number of runn
 
 @app.post('/chatbot/')
 async def chat(chatMessage:ChatBody):
+    f = open("./log.txt", "a")
+    f.write("in chat function\n")
+    f.close()
     processed_message = ''
     for message in chatMessage.messages:
         processed_message = processed_message + f" {message.role}: {message.content}\n"
@@ -49,13 +52,20 @@ async def chat(chatMessage:ChatBody):
 
     threadLimiter.acquire()
     try:
-        content=chatbot(processed_message, chatMessage.temperature)
+        content= await chatbot(processed_message, chatMessage.temperature)
     finally:
         threadLimiter.release()
+
+    f = open("log.txt","a")
+    f.write("chat result\n")
+    f.write("content")
+    f.write(str(content))
+    f.write(f"{processed_message} {chatMessage.temperature}")
+    f.write("\n")
+    f.close()
     return EventSourceResponse(sep="\r\n",
                                status_code=200,
                                content=content,
-                            #    content=chatbot(processed_message, chatMessage.temperature),
                                headers={'Content-Type': 'text/plain',})
     #ping=600  
 
@@ -63,39 +73,26 @@ async def chat(chatMessage:ChatBody):
 
 @app.post('/submit_prompt/',response_model=Answers)
 def submit_propmt(message:PromptWNumAnswers):
+    f = open("./log.txt","a")
+    f.write("in submit prompt\n")
+    f.close()
     global generate_multiple_answers
     res = generate_multiple_answers(message.prompt, message.numAnswers)
+    f = open("./log.txt","a")
+    f.write("generate multiple answers\n")
+    f.write("answers are")
+    f.write(str(res))
+    f.write("\n")
+    f.close()
     return Answers(answers=res)
 
-# def load_taccgpt_rank(args):
-#     global generate_multiple_answers
-#     generate_multiple_answers = create_taccgpt_rank(args.path, args.max_new_tokens)
 
-# def load_taccgpt_chatbot(args):
-#     global chatbot
-#     chatbot = create_taccgpt_chat(args.path, args.max_new_tokens)
 
 def load_taccgpt(args):
     global chatbot, generate_multiple_answers
     chatbot, generate_multiple_answers = create_taccgpt(args.path,args.max_new_tokens)
 
-# def mount_gradio_ChatInterface(args):
-#     global chatbot
-#     chatbot = create_taccgpt_chat(args.path, args.max_new_tokens)
 
-#     tacc_gpt_interface = gr.ChatInterface(fn=chatbot,
-#                       chatbot=gr.Chatbot(height=700,show_copy_button=True),
-#                       textbox=gr.Textbox(placeholder="Welcome to use TACC GPT, please type your question here.", 
-#                                          container=False, scale=20),
-#                       title="TACC GPT",
-#                       theme="soft")
-#     tacc_gpt_interface = tacc_gpt_interface.queue()
-#     chatbot_app = gr.mount_gradio_app(app, tacc_gpt_interface, path=CUSTOM_PATH, gradio_api_url=f"http://{args.http_host}:{args.http_port}{CUSTOM_PATH}/")
-
-#     # config = uvicorn.Config(chatbot_app, host=args.http_host, port=args.http_port, log_level="debug", reload=True)
-#     config = uvicorn.Config(app, host=args.http_host, port=args.http_port, reload=True)
-#     server = uvicorn.Server(config=config)
-#     return server
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -121,9 +118,18 @@ if __name__ == '__main__':
     # load_taccgpt_rank(args)
     # load_taccgpt_chatbot(args)
 
+    open('./log.txt', 'w').close()
+    f = open("./log.txt","a+")
+    f.write("in main\n")
+    f.close()
     load_taccgpt(args)
-
+    f = open("./log.txt","a+")
+    f.write("load model\n")
+    f.close()
     # server = mount_gradio_ChatInterface(args)
     config = uvicorn.Config(app, host=args.http_host, port=args.http_port, reload=True)
     server = uvicorn.Server(config=config)
+    f = open("./log.txt","a")
+    f.write("before run server\n")
+    f.close()
     server.run()
