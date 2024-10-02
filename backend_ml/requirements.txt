@@ -19,3 +19,4 @@ accelerate
 unstructured
 markdown
 sentence-transformers
+langchain_huggingface
