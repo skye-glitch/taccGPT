@@ -52,8 +52,8 @@ from operator import itemgetter
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
-def main():
-    path = "/work/07980/sli4/ls6/code/DeepSpeedChat/applications/DeepSpeed-Chat/training/step1_supervised_finetuning/output_Llama-3.1-8B-Instruct_24ds_ascii/"
+def main(in_path="/work/07980/sli4/ls6/code/DeepSpeedChat/applications/DeepSpeed-Chat/training/step1_supervised_finetuning/output_Llama-3.1-8B-Instruct_24ds_ascii/", in_MODEL_NAME="/work/07980/sli4/ls6/code/DeepSpeedChat/applications/DeepSpeed-Chat/training/step1_supervised_finetuning/output_Llama-3.1-8B-Instruct_24ds_ascii/"):
+    path = in_path
     tokenizer = AutoTokenizer.from_pretrained(path)
     model_config = AutoConfig.from_pretrained(path)
     model = AutoModelForCausalLM.from_pretrained(path,
@@ -111,7 +111,7 @@ def main():
     message = "What is design safe project?"
     temperature = 0.9
 
-    MODEL_NAME = "/work/07980/sli4/ls6/code/DeepSpeedChat/applications/DeepSpeed-Chat/training/step1_supervised_finetuning/output_Llama-3.1-8B-Instruct_24ds_ascii/"
+    MODEL_NAME = in_MODEL_NAME
     generation_config = GenerationConfig.from_pretrained(MODEL_NAME)
     generation_config.temperature = temperature
     generation_config.top_p = 0.95
@@ -177,4 +177,11 @@ def main():
     # print(res)
 
 if __name__=="__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description='Put in model name and path')
+    parser.add_argument('--path', metavar='path', required=True,
+                        help='the path to model')
+    parser.add_argument('--MODEL_NAME', metavar='path', required=True,
+                        help='name of model')
+    args = parser.parse_args()
+    main(path=args.path, MODEL_NAME=args.MODEL_NAME)
