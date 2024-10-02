@@ -179,9 +179,9 @@ def main(in_path="/work/07980/sli4/ls6/code/DeepSpeedChat/applications/DeepSpeed
 if __name__=="__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Put in model name and path')
-    parser.add_argument('--path', metavar='path', required=True,
+    parser.add_argument('--path', metavar='path', 
                         help='the path to model')
-    parser.add_argument('--MODEL_NAME', metavar='path', required=True,
+    parser.add_argument('--MODEL_NAME', metavar='path', 
                         help='name of model')
     args = parser.parse_args()
-    main(path=args.path, MODEL_NAME=args.MODEL_NAME)
+    main(in_path=args.path, in_MODEL_NAME=args.MODEL_NAME)
