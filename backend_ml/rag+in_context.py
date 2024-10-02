@@ -9,8 +9,7 @@ from models import Message
 from typing import List, Optional
 import re
 
-from LLMChainProcessOutput import LLMChainProcessOutput
-from langchain.memory import RedisChatMessageHistory
+from langchain_community.chat_message_histories import RedisChatMessageHistory
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
@@ -26,17 +25,16 @@ from threading import Thread
 user_email = None
 
 # for RAG
-from langchain import HuggingFacePipeline
+from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
 from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig, pipeline
-from langchain.document_loaders import UnstructuredMarkdownLoader
+from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain_community.document_loaders import DirectoryLoader
 import transformers
 from transformers import LlamaForCausalLM, LlamaTokenizer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import Chroma
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
-from langchain import PromptTemplate
 from langchain import hub
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
@@ -55,7 +53,7 @@ def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 def main():
-    path = "/etc/TACC_GPT/nlp_models/Meta-Llama-3.1-8B-Instruct/"
+    path = "/work/07980/sli4/ls6/code/DeepSpeedChat/applications/DeepSpeed-Chat/training/step1_supervised_finetuning/output_Llama-3.1-8B-Instruct_24ds_ascii/"
     tokenizer = AutoTokenizer.from_pretrained(path)
     model_config = AutoConfig.from_pretrained(path)
     model = AutoModelForCausalLM.from_pretrained(path,
@@ -68,7 +66,10 @@ def main():
     # RAG
     # todo: use all content in the directory
     # loader = DirectoryLoader('./DS-User-Guide/user-guide/docs/', glob="**/*.md", show_progress=True, loader_cls=UnstructuredMarkdownLoader)
-    loader = DirectoryLoader('./DS-User-Guide/user-guide/docs/analysis', glob="**/*.md", show_progress=True, loader_cls=UnstructuredMarkdownLoader)
+    loader = DirectoryLoader('./DS-User-Guide/user-guide/docs/', glob="**/*.md", show_progress=True, loader_cls=UnstructuredMarkdownLoader)
+    # fix for ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1007)
+    import ssl
+    ssl._create_default_https_context = ssl._create_stdlib_context
     docs = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=64)
     texts = text_splitter.split_documents(docs)
@@ -108,9 +109,9 @@ def main():
     )
 
     message = "What is design safe project?"
-    temperature = 0.2
+    temperature = 0.9
 
-    MODEL_NAME = "./nlp_models/output_1.3b_epoch32_sqLength512"
+    MODEL_NAME = "/work/07980/sli4/ls6/code/DeepSpeedChat/applications/DeepSpeed-Chat/training/step1_supervised_finetuning/output_Llama-3.1-8B-Instruct_24ds_ascii/"
     generation_config = GenerationConfig.from_pretrained(MODEL_NAME)
     generation_config.temperature = temperature
     generation_config.top_p = 0.95
@@ -159,7 +160,8 @@ def main():
         ("system", "You are an assistant for question-answering tasks. Use the following pieces of examples and retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise"),
         few_shot_prompt,
         ("human", "{question}"),
-        ("human", "{context}")
+        ("human", "{context}"),
+        ("end of prompt"),
     ])
     shot_rag_chain = (
     {"context": itemgetter("question") | retriever | format_docs,
