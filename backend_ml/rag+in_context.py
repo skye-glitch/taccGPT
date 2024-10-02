@@ -89,13 +89,18 @@ def main(in_path="/work/07980/sli4/ls6/code/DeepSpeedChat/applications/DeepSpeed
     # Retrieve and generate using the relevant snippets of the blog.
     retriever = db.as_retriever()
 
-    examples = [
-        {"input": "2_happy", "output": "4_sad"},
-        {"input": "6_tall", "output": "8_short"},
-        {"input": "10_energetic", "output": "12_lethargic"},
-        {"input": "14_sunny", "output": "16_gloomy"},
-        {"input": "18_windy", "output": "20_calm"},
-    ]
+    # examples = [
+    #     {"input": "2_happy", "output": "4_sad"},
+    #     {"input": "6_tall", "output": "8_short"},
+    #     {"input": "10_energetic", "output": "12_lethargic"},
+    #     {"input": "14_sunny", "output": "16_gloomy"},
+    #     {"input": "18_windy", "output": "20_calm"},
+    # ]
+    import json
+
+    # From a file
+    with open('/work/07980/sli4/ls6/code/taccGPT/backend_ml/ds_examples.json') as f:
+        examples = json.load(f)
 
     example_selector = SemanticSimilarityExampleSelector.from_examples(
         # This is the list of examples available to select from.
