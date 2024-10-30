@@ -1,0 +1,41 @@
+<html>
+<head>
+    <title>Show Database</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+	<h2>Data Collected in MongoDB</h2>
+	<div class="table-wrapper">
+	<table class="fl-table">
+	<thead>                                                                                                                                                                                                                                                                                                       
+    		<tr style="text-align: center;">                                                                                                                                                                   
+      		<!-- <th>Index</th>
+      		<th>Prompt</th>
+      		<th>Answer</th> -->
+					{% if data |length > 0 %}
+						{% for key in data[0].keys() %}
+							{% if key != "_id" %}
+								<th>{{ key }}</th>
+							{% endif %}
+						{% endfor %}
+					{% endif %}
+   	 	</tr>                                                                                                                                                                                                                                                                                                  
+  	</thead>  
+	<tbody>
+		{% for d in data %}
+		<tr>
+			<!-- <td>{{ d['index'] }}</td>
+			<td>{{ d['prompt'] }}</td>
+			<td>{{ d['answer'] }}</td> -->
+
+			{% for key, val in d.items() %}
+				{% if key != "_id" %}
+					<td>{{ val }}</td>
+				{% endif %}
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+	</table>
+	</div>
+</html>
+
