@@ -1,44 +1,21 @@
 import torch
-import os
-import json
-import time
-import sys
-import requests
-from datetime import datetime
-from models import Message
-from typing import List, Optional
-import re
 
-from langchain_community.chat_message_histories import RedisChatMessageHistory
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.callbacks.manager import CallbackManager
-from langchain.callbacks.base import BaseCallbackHandler
 
 from transformers import pipeline
-from transformers import AutoConfig, OPTForCausalLM, AutoTokenizer, LlamaForCausalLM,AutoModelForCausalLM
+from transformers import AutoConfig, AutoTokenizer, AutoModelForCausalLM, GenerationConfig
 from transformers import TextIteratorStreamer
+from transformers import BitsAndBytesConfig
 
-from concurrent.futures import ThreadPoolExecutor
-from threading import Thread
-# Will be added after AUTH is finished
-user_email = None
 
 # for RAG
 from langchain_huggingface import HuggingFacePipeline
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig, pipeline
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain_community.document_loaders import DirectoryLoader
 import transformers
-from transformers import LlamaForCausalLM, LlamaTokenizer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma 
-from langchain.chains import RetrievalQA
-from langchain import hub
-from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from textwrap import fill
 from langchain_community.document_transformers import EmbeddingsRedundantFilter
 from langchain.retrievers.document_compressors import DocumentCompressorPipeline
 from langchain.retrievers import ContextualCompressionRetriever
@@ -47,10 +24,8 @@ from accelerate import load_checkpoint_and_dispatch
 from accelerate import init_empty_weights
 
 # example selector for in-context learning
-from langchain_core.example_selectors import SemanticSimilarityExampleSelector
 from langchain_core.prompts import (
     ChatPromptTemplate,
-    FewShotChatMessagePromptTemplate,
 )
 from operator import itemgetter
 
@@ -64,21 +39,23 @@ def main(in_path="/scratch/07980/sli4/data/gpt/meta-llama/Meta-Llama-3.1-8B-Inst
     model_config = AutoConfig.from_pretrained(path)
     
     if quant is not None:
-        if quant == "4":            
+        if quant == "4": 
+            quantization_config = BitsAndBytesConfig(load_in_4bit=True)           
             model = AutoModelForCausalLM.from_pretrained(path,
                                     from_tf=bool(".ckpt" in path),
                                     config=model_config,
                                     device_map="auto",
                                     # quantize to fit in RAM
-                                    load_in_4bit=True,
+                                    quantization_config=quantization_config,
                                     )
         elif quant == "8":
+            quantization_config = BitsAndBytesConfig(load_in_8bit=True)
             model = AutoModelForCausalLM.from_pretrained(path,
                                     from_tf=bool(".ckpt" in path),
                                     config=model_config,
                                     device_map="auto",
                                     # quantize to fit in RAM
-                                    load_in_8bit=True,
+                                    quantization_config=quantization_config,
                                     )
         else:
             raise Exception("no matching quant format")
@@ -86,7 +63,7 @@ def main(in_path="/scratch/07980/sli4/data/gpt/meta-llama/Meta-Llama-3.1-8B-Inst
         with init_empty_weights():
             model = AutoModelForCausalLM.from_config(model_config)
         device_map = infer_auto_device_map(model, max_memory={0: "30GiB", 1: "30GiB", 2: "30GiB"})
-        model = load_checkpoint_and_dispatch(model, path, device_map=device_map)
+        model = load_checkpoint_and_dispatch(model, path, device_map=device_map,offload_folder="/scratch/07980/sli4/huggingface_cache/offload")
     model.eval()
     model.config.end_token_id = tokenizer.eos_token_id
     model.config.pad_token_id = model.config.eos_token_id
@@ -110,8 +87,8 @@ def main(in_path="/scratch/07980/sli4/data/gpt/meta-llama/Meta-Llama-3.1-8B-Inst
     #print(f'query result len is {len(query_result)}')
 
     # only need to insert document once
-    #db = Chroma.from_documents(texts, embeddings, persist_directory="db_ce")
-    db = Chroma(persist_directory="db_ce", embedding_function=embeddings)
+    db = Chroma.from_documents(texts, embeddings, persist_directory="db_ce")
+    #db = Chroma(persist_directory="db_ce", embedding_function=embeddings)
     #results = db.similarity_search("data structure", k=2)
     #print(results[0].page_content)
 
@@ -206,8 +183,8 @@ def main(in_path="/scratch/07980/sli4/data/gpt/meta-llama/Meta-Llama-3.1-8B-Inst
             results = db.similarity_search(question, k=2)
             retrieved_context = format_docs(results)
             prompt = f"system: You are a TA for students. Use the following retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use one sentences maximum and keep the answer concise. Give students hints instead of telling them the answer.\"\n human:{retrieved_context} \n human: {question}"
-            inputs = tokenizer(prompt).to(0)
-            outputs = model.generate(x1, max_new_tokens=512, do_sample=True)[0]
+            inputs = tokenizer(prompt,return_tensors="pt").to(0)
+            outputs = model.generate(**inputs, max_new_tokens=512, do_sample=True)[0]
             print("Here is the answer:")
             print(tokenizer.decode(outputs.cpu().squeeze()))
             print("=====================================================")
