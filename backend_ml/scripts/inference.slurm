@@ -11,9 +11,9 @@
 
 module load tacc-apptainer
 
-cd /scratch/07980/sli4/containers
-rm taccgptback_latest.sif
-apptainer pull docker://skyeglitch/taccgptback
+# cd /scratch/07980/sli4/containers
+# rm taccgptback_latest.sif
+# apptainer pull docker://skyeglitch/taccgptback
 
 # cd /work/07980/sli4/ls6/code/taccGPT/backend_ml
 # apptainer shell --nv /scratch/07980/sli4/containers/taccgptback_latest.sif

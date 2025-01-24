@@ -49,7 +49,7 @@ def main(in_path="/scratch/07980/sli4/data/gpt/meta-llama/Meta-Llama-3.1-8B-Inst
                                     quantization_config=quantization_config,
                                     )
         elif quant == "8":
-            quantization_config = BitsAndBytesConfig(load_in_8bit=True)
+            quantization_config = BitsAndBytesConfig(load_in_8bit=True) 
             model = AutoModelForCausalLM.from_pretrained(path,
                                     from_tf=bool(".ckpt" in path),
                                     config=model_config,
@@ -186,7 +186,7 @@ def main(in_path="/scratch/07980/sli4/data/gpt/meta-llama/Meta-Llama-3.1-8B-Inst
             inputs = tokenizer(prompt,return_tensors="pt").to(0)
             outputs = model.generate(**inputs, max_new_tokens=512, do_sample=True)[0]
             print("Here is the answer:")
-            print(tokenizer.decode(outputs.cpu().squeeze()))
+            print(tokenizer.decode(outputs.cpu().squeeze()).split(question)[-1])
             print("=====================================================")
             
 

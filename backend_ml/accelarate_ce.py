@@ -21,9 +21,11 @@ path = "/scratch/07980/sli4/data/gpt/meta-llama/Llama-2-7b-chat-hf/"
 # sdpa implementation which is the default torch>2.1.2 fails with the tracing + attention mask kwarg
 # with attn_implementation="eager" mode, the forward is very slow for some reason
 model = AutoModelForCausalLM.from_pretrained(
-    path, low_cpu_mem_usage=True, attn_implementation="sdpa"
+    path, device_map="sequential", low_cpu_mem_usage=True, attn_implementation="sdpa"
 )
+
 model.eval()
+print(model)
 
 # Input configs
 # Create example inputs for the model
